@@ -1,7 +1,9 @@
 package local.learnspring.controller;
 
+import jakarta.validation.Valid;
 import local.learnspring.dto.request.UserCreationRequest;
 import local.learnspring.dto.request.UserUpdateRequest;
+import local.learnspring.dto.response.ApiResponse;
 import local.learnspring.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,28 +16,38 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    ResponseEntity<?> createUser(@RequestBody UserCreationRequest request){
-        return ResponseEntity.ok(userService.createUser(request));
+    ApiResponse<?> create(@RequestBody @Valid UserCreationRequest request){
+        return ApiResponse.builder()
+                .result((userService.create(request)))
+                .build();
     }
 
     @GetMapping
-    ResponseEntity<?> fillAll(){
-        return ResponseEntity.ok(userService.findAll());
+    ApiResponse<?> fillAll(){
+        return ApiResponse.builder()
+                .result(userService.findAll())
+                .build();
     }
 
     @GetMapping("/{id}")
-    ResponseEntity<?> getUserById(@PathVariable String id){
-        return ResponseEntity.ok(userService.getUserById(id));
+    ApiResponse<?> getById(@PathVariable String id){
+        return ApiResponse.builder()
+                .result(userService.getById(id))
+                .build();
     }
 
     @PutMapping("/{id}")
-    ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody UserUpdateRequest request){
-        return ResponseEntity.ok(userService.updateUser(id, request));
+    ApiResponse<?> update(@PathVariable String id, @RequestBody UserUpdateRequest request){
+        return ApiResponse.builder()
+                .result(userService.update(id, request))
+                .build();
     }
 
     @DeleteMapping("/{id}")
-    ResponseEntity<?> deleteUser(@PathVariable String id){
-        userService.deleteUserById(id);
-        return ResponseEntity.ok("Delete successfully");
+    ApiResponse<?> delete(@PathVariable String id){
+        userService.deleteById(id);
+        return ApiResponse.builder()
+                .message("Delete successfully")
+                .build();
     }
 }

@@ -4,6 +4,8 @@ import local.learnspring.dto.request.UserCreationRequest;
 import local.learnspring.dto.request.UserUpdateRequest;
 import local.learnspring.dto.response.UserResponse;
 import local.learnspring.entity.User;
+import local.learnspring.exception.AppException;
+import local.learnspring.exception.ErrorCode;
 import local.learnspring.mapper.UserMapper;
 import local.learnspring.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -17,7 +19,10 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
-    public UserResponse createUser(UserCreationRequest request){
+    public UserResponse create(UserCreationRequest request){
+        if (userRepository.existsByUsername(request.getUsername())){
+            throw new AppException(ErrorCode.USER_EXISTED);
+        }
         User user = userMapper.toEntity(request);
         return userMapper.toResponse(userRepository.save(user));
     }
@@ -28,18 +33,18 @@ public class UserService {
                 .toList();
     }
 
-    public UserResponse getUserById(String id){
-        return userMapper.toResponse(userRepository.findById(id).orElseThrow(() -> new RuntimeException("id is not exists")));
+    public UserResponse getById(String id){
+        return userMapper.toResponse(userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED)));
     }
 
-    public UserResponse updateUser(String id, UserUpdateRequest request){
-        User user = userRepository.findById(id).orElseThrow(() -> new RuntimeException("id is not exists"));
+    public UserResponse update(String id, UserUpdateRequest request){
+        User user = userRepository.findById(id).orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
         userMapper.update(request,user);
         userRepository.save(user);
         return userMapper.toResponse(user);
     }
 
-    public void deleteUserById(String id){
+    public void deleteById(String id){
         userRepository.deleteById(id);
     }
 }
