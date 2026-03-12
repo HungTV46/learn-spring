@@ -1,6 +1,8 @@
 package local.learnspring.controller;
 
+import com.nimbusds.jose.JOSEException;
 import local.learnspring.dto.request.AuthenticationRequest;
+import local.learnspring.dto.request.IntrospectRequest;
 import local.learnspring.dto.response.ApiResponse;
 import local.learnspring.dto.response.AuthenticationResponse;
 import local.learnspring.service.AuthenticationService;
@@ -10,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.text.ParseException;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("v1/api/auth")
@@ -17,13 +21,19 @@ public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
 
-    @PostMapping("/log-in")
-    ApiResponse<?> authenticate(@RequestBody AuthenticationRequest request){
-        boolean result = authenticationService.authenticate(request);
+    @PostMapping("/token")
+    ApiResponse<?> authenticate(@RequestBody AuthenticationRequest request) throws JOSEException {
+        var result = authenticationService.authenticate(request);
         return ApiResponse.builder()
-                .result(AuthenticationResponse.builder()
-                        .authenticated(result)
-                        .build())
+                .result(result)
+                .build();
+    }
+
+    @PostMapping("/introspect")
+    ApiResponse<?> introspect(@RequestBody IntrospectRequest request) throws JOSEException, ParseException {
+        var result = authenticationService.introspect(request);
+        return ApiResponse.builder()
+                .result(result)
                 .build();
     }
 }

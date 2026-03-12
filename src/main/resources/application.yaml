@@ -17,3 +17,6 @@ spring:
     properties:
       hibernate:
         format_sql: true # Tự động format câu lệnh SQL cho dễ đọc
+
+jwt:
+  signerKey: "bX5zmoxlsod8UqEEuTM1+AcwBuqDgT6xlZN5mpzoTnlzmb2MUbuW68X+OR4B8v2Q"
